@@ -1,0 +1,33 @@
+generated: '2026-08-05'
+method: generated
+source:
+- mcp/100-thieves-tools-list.json
+- https://100thieves.com/agents.md
+note: >-
+  Every operation named below was verified verbatim in the live tools/list response
+  saved at mcp/100-thieves-tools-list.json. 100 Thieves publishes no OpenAPI, so these
+  skills are grounded in MCP tool names and their JSON Schema input contracts rather
+  than in operationIds. No provider-published skill file was found on the host; the
+  store instead points agents at the platform-wide Shop skill at https://shop.app/SKILL.md.
+skills:
+- file: 100-thieves-browse-catalog.md
+  name: Browse the 100 Thieves catalog
+  api: mcp/100-thieves-mcp.yml
+  operations: [search_catalog, lookup_catalog, get_product]
+  consequence: read
+- file: 100-thieves-build-cart.md
+  name: Build and maintain a 100 Thieves cart
+  api: mcp/100-thieves-mcp.yml
+  operations: [create_cart, get_cart, update_cart, cancel_cart, get_product]
+  consequence: write
+- file: 100-thieves-checkout-with-buyer-approval.md
+  name: Complete a 100 Thieves checkout with buyer approval
+  api: mcp/100-thieves-mcp.yml
+  operations: [create_checkout, get_checkout, update_checkout, complete_checkout, cancel_checkout,
+    get_order]
+  consequence: financial
+  human_in_the_loop: required
+coverage:
+  skills: 3
+  tools_covered: 13
+  tools_total: 13

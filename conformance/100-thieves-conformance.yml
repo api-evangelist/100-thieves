@@ -1,0 +1,104 @@
+generated: '2026-08-05'
+method: probed
+source:
+- https://100thieves.com/.well-known/ucp
+- https://100thieves.com/.well-known/openid-configuration
+- https://100thieves.com/.well-known/oauth-authorization-server
+- https://100thieves.com/api/ucp/mcp
+- https://100thieves.com/api/2024-04/graphql.json
+- https://100thieves.com/llms.txt
+standards:
+- id: ucp-shopping
+  name: Universal Commerce Protocol — dev.ucp.shopping
+  conforms: true
+  version: '2026-04-08'
+  evidence: /.well-known/ucp returns a merchant profile declaring service dev.ucp.shopping
+    at version 2026-04-08 (and 2026-01-23), transport mcp, with capabilities cart,
+    checkout, fulfillment, discount and order.
+  spec: https://ucp.dev/2026-04-08/specification/overview/
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence: POST /api/ucp/mcp with a JSON-RPC 2.0 tools/list request returned HTTP
+    200 and a result.tools array of 13 tools, each with a JSON Schema inputSchema.
+- id: jsonrpc-2.0
+  name: JSON-RPC 2.0
+  conforms: true
+  evidence: The MCP endpoint accepts and answers jsonrpc:"2.0" envelopes.
+- id: oidc-discovery
+  name: OpenID Connect Discovery 1.0
+  conforms: true
+  evidence: /.well-known/openid-configuration returns issuer, authorization_endpoint,
+    token_endpoint, jwks_uri, response_types_supported, subject_types_supported and
+    id_token_signing_alg_values_supported.
+- id: rfc8414-oauth-metadata
+  name: RFC 8414 OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: /.well-known/oauth-authorization-server returns 200 with the required metadata
+    fields.
+- id: oauth2-pkce
+  name: RFC 7636 PKCE
+  conforms: true
+  evidence: code_challenge_methods_supported is ["S256"].
+- id: graphql
+  name: GraphQL (June 2018 spec, Shopify Storefront 2024-04)
+  conforms: true
+  evidence: Anonymous full introspection returned a valid __schema with 414 types,
+    35 query root fields and 41 mutations.
+- id: llmstxt
+  name: llms.txt
+  conforms: true
+  evidence: /llms.txt returns 200 text/markdown with agent-facing store instructions.
+- id: robots-exclusion
+  name: Robots Exclusion Protocol
+  conforms: true
+  evidence: /robots.txt returns 200 with User-agent/Allow/Disallow directives plus
+    an explicit agent-policy comment block.
+- id: rfc8615-well-known
+  name: RFC 8615 well-known URIs
+  conforms: true
+  evidence: Serves /.well-known/ucp, /.well-known/openid-configuration and /.well-known/oauth-authorization-server;
+    a control path returned 404, so these are real registrations rather than a catch-all.
+- id: rfc9116-security-txt
+  name: RFC 9116 security.txt
+  conforms: false
+  evidence: /.well-known/security.txt returned 404.
+- id: rfc9457-problem-details
+  name: RFC 9457 Problem Details
+  conforms: false
+  evidence: Errors are JSON-RPC 2.0 error objects and GraphQL errors[], not application/problem+json.
+- id: a2a
+  name: A2A Agent Card
+  conforms: false
+  evidence: /.well-known/agent-card.json and /.well-known/agent.json returned 404 on
+    both 100thieves.com and 100t.myshopify.com.
+- id: openapi
+  name: OpenAPI
+  conforms: false
+  evidence: No OpenAPI or Swagger document found on any host (see mcp/100-thieves-tool-crosswalk.yml
+    surfaces block for the probe list).
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence: No public event, streaming or webhook surface is published for this merchant
+    storefront.
+- id: apis-json
+  name: APIs.json
+  conforms: false
+  evidence: /.well-known/api-catalog returned 404 and no apis.json is published.
+compliance_program:
+  published_by_100_thieves: false
+  note: >-
+    100 Thieves publishes no trust center, no certification list, and no security.txt.
+    Payment card handling is delegated to Shopify and Shop Pay; the store's own pages
+    make no SOC 2 / ISO 27001 / PCI DSS claim. No Compliance pointer is emitted.
+x-evidence:
+  fetched: '2026-08-05'
+  probes:
+  - {url: 'https://100thieves.com/.well-known/ucp', status: 200}
+  - {url: 'https://100thieves.com/api/ucp/mcp', status: 200}
+  - {url: 'https://100thieves.com/api/2024-04/graphql.json', status: 200}
+  - {url: 'https://100thieves.com/.well-known/openid-configuration', status: 200}
+  - {url: 'https://100thieves.com/.well-known/security.txt', status: 404}
+  - {url: 'https://100thieves.com/.well-known/agent-card.json', status: 404}
+  - {url: 'https://100thieves.com/openapi.json', status: 404}

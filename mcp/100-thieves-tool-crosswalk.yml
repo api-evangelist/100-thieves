@@ -1,0 +1,160 @@
+generated: '2026-08-05'
+method: derived
+source:
+- mcp/100-thieves-tools-list.json
+- graphql/100-thieves-storefront.graphql
+- https://100thieves.com/agents.md
+note: >-
+  100 Thieves publishes no OpenAPI, so this crosswalk binds each UCP/MCP tool to the
+  Storefront GraphQL field(s) and to the documented storefront JSON endpoints instead
+  of to operationIds. Every GraphQL field named below was verified verbatim in the
+  introspected 2024-04 schema; every tool name was verified in the live tools/list
+  response. Bindings are semantic — Shopify does not publish a tool-to-field mapping
+  — so confidence is recorded honestly and no binding is asserted as exact.
+surfaces:
+  openapi: null
+  openapi_note: No OpenAPI or Swagger document is published on any 100 Thieves host
+    (probed /openapi.json, /swagger.json, /api-docs, /docs — all 404).
+  graphql:
+    endpoint: https://100thieves.com/api/2024-04/graphql.json
+    schema: graphql/100-thieves-storefront.graphql
+    introspection: open
+    gated: false
+    version: '2024-04'
+  mcp:
+    endpoint: https://100thieves.com/api/ucp/mcp
+    manifest: mcp/100-thieves-tools-list.json
+    tools_list: open
+    gated: false
+  json:
+    documented_at: https://100thieves.com/agents.md
+    endpoints:
+    - GET /products/{handle}.json
+    - GET /collections/{handle}/products.json
+    - GET /collections/all
+    - GET /search?q={query}&type=product
+    - GET /sitemap.xml
+crosswalk:
+- tool: search_catalog
+  category: catalog
+  graphql: [search, predictiveSearch, products]
+  json: ["GET /search?q={query}&type=product", "GET /collections/{handle}/products.json"]
+  binding: graphql
+  confidence: medium
+  note: UCP catalog search accepts natural language plus filters; the GraphQL search
+    and products connections are the closest equivalents but the tool response conforms
+    to dev.ucp.shopping.catalog.search, not to the GraphQL connection shape.
+- tool: lookup_catalog
+  category: catalog
+  graphql: [nodes, products, productByHandle]
+  json: []
+  binding: graphql
+  confidence: medium
+  note: Batch identifier resolution; nodes() is the GraphQL batch-by-id equivalent.
+- tool: get_product
+  category: catalog
+  graphql: [product, productByHandle]
+  json: ["GET /products/{handle}.json"]
+  binding: graphql
+  confidence: high
+- tool: create_cart
+  category: cart
+  graphql: [cartCreate]
+  binding: graphql
+  confidence: high
+- tool: get_cart
+  category: cart
+  graphql: [cart]
+  binding: graphql
+  confidence: high
+- tool: update_cart
+  category: cart
+  graphql: [cartLinesAdd, cartLinesUpdate, cartLinesRemove, cartAttributesUpdate, cartNoteUpdate,
+    cartBuyerIdentityUpdate, cartDiscountCodesUpdate]
+  binding: graphql
+  confidence: medium
+  note: One MCP tool fans out to seven GraphQL mutations — update_cart takes a whole
+    cart delta where GraphQL splits the same work per concern.
+- tool: cancel_cart
+  category: cart
+  graphql: [cartRemovePersonalData]
+  binding: graphql
+  confidence: low
+  note: The 2024-04 Storefront schema exposes no cart-delete mutation; cancellation
+    is server-side in UCP. Recorded as low confidence rather than dropped.
+- tool: create_checkout
+  category: checkout
+  graphql: []
+  binding: none
+  confidence: low
+- tool: get_checkout
+  category: checkout
+  graphql: []
+  binding: none
+  confidence: low
+- tool: update_checkout
+  category: checkout
+  graphql: [cartDeliveryAddressesAdd, cartDeliveryAddressesUpdate, cartDeliveryAddressesReplace,
+    cartSelectedDeliveryOptionsUpdate, cartBillingAddressUpdate]
+  binding: graphql
+  confidence: medium
+  note: Setting shipping address and delivery method maps onto the cart delivery mutations;
+    the UCP checkout object itself has no GraphQL analogue.
+- tool: complete_checkout
+  category: checkout
+  graphql: [cartPrepareForCompletion, cartSubmitForCompletion]
+  binding: graphql
+  confidence: medium
+  note: Requires contemporaneous human buyer approval of payment per the store's published
+    agent rules; the GraphQL path is the two-step prepare/submit pair.
+- tool: cancel_checkout
+  category: checkout
+  graphql: []
+  binding: none
+  confidence: low
+- tool: get_order
+  category: order
+  graphql: [customer]
+  binding: graphql
+  confidence: low
+  note: QueryRoot has no top-level order field. Orders are only reachable in GraphQL
+    via customer.orders behind a customer access token; the MCP tool resolves an order
+    by id directly.
+mcp_only:
+- tool: create_checkout
+  reason: The 2024-04 Storefront GraphQL schema removed all checkout* mutations; UCP
+    models checkout as a first-class server-side object with no public GraphQL equivalent.
+- tool: get_checkout
+  reason: Same — no checkout query field exists in the published schema.
+- tool: cancel_checkout
+  reason: Same — no checkout mutation surface in GraphQL.
+graphql_only:
+- fields: [article, articles, blog, blogByHandle, blogs, page, pageByHandle, pages,
+    menu, metaobject, metaobjects, shop, localization, locations, urlRedirects, sitemap,
+    publicApiVersions, productTags, productTypes, productRecommendations, collection,
+    collectionByHandle, collections, paymentSettings, shopPayInstallmentsPricing, cartCompletionAttempt]
+  reason: Content, merchandising, store-metadata and recommendation surfaces with no
+    UCP shopping tool.
+- fields: [customerCreate, customerUpdate, customerRecover, customerReset, customerResetByUrl,
+    customerActivate, customerActivateByUrl, customerAccessTokenCreate, customerAccessTokenCreateWithMultipass,
+    customerAccessTokenRenew, customerAccessTokenDelete, customerAddressCreate, customerAddressUpdate,
+    customerAddressDelete, customerDefaultAddressUpdate]
+  reason: Customer identity and account management — deliberately outside the anonymous
+    agent commerce surface.
+- fields: [shopPayPaymentRequestSessionCreate, shopPayPaymentRequestSessionSubmit,
+    cartPaymentUpdate, cartGiftCardCodesAdd, cartGiftCardCodesRemove, cartGiftCardCodesUpdate,
+    cartClone, cartMetafieldsSet, cartMetafieldDelete, cartDeliveryAddressesRemove,
+    node]
+  reason: Payment-session, cart-extension and generic node-resolution fields not projected
+    into the UCP tool set.
+rest_only: []
+rest_only_note: No OpenAPI exists to enumerate REST operations. The documented storefront
+  JSON endpoints are all covered by catalog tools and are listed inline above.
+coverage:
+  tools_named: 13
+  tools_bound: 10
+  tools_bound_high_confidence: 3
+  mcp_only: 3
+  graphql_root_fields_total: 76
+  graphql_fields_with_a_tool: 24
+  graphql_only: 52

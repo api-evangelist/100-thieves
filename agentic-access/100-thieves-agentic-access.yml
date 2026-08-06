@@ -1,0 +1,143 @@
+generated: '2026-08-05'
+method: searched
+source:
+- https://100thieves.com/agents.md
+- https://100thieves.com/robots.txt
+- https://100thieves.com/llms.txt
+- mcp/100-thieves-tools-list.json
+note: >-
+  Unlike most entries in the catalog, this is not a generated governance starting
+  point — 100 Thieves (via its Shopify UCP storefront) actually publishes agent access
+  rules, so the contract below is transcribed from the provider's own statements and
+  from the live tool schemas. derive-agentic-access.py was not run: it reads openapi/,
+  and there is no OpenAPI here.
+provider_published_policy:
+  canonical_document: https://100thieves.com/agents.md
+  mirrors: [https://100thieves.com/llms.txt]
+  advertised_in: [robots.txt]
+  rules:
+  - id: buyer-approval-invariant
+    statement: >-
+      "Checkouts are for humans. Do NOT complete checkout, payment, or order placement
+      automatically — no scripted form fills, browser automation, or end-to-end agent
+      flows that finalize payment without an explicit, contemporaneous human approval
+      step."
+    source: https://100thieves.com/robots.txt
+  - id: sanctioned-transaction-paths
+    statement: Agents transacting on a buyer's behalf must use the UCP/MCP endpoint
+      or the Shop skill; both require buyer approval before payment.
+    paths: [https://100thieves.com/api/ucp/mcp, https://shop.app/SKILL.md]
+  - id: rate-limits
+    statement: The MCP endpoint is rate-limited per IP. Back off on 429 responses.
+  - id: buyer-context
+    statement: Pass context.address_country and context.currency for accurate pricing
+      and availability.
+  - id: crawling-permitted
+    statement: Public product, collection, page, blog, policy, cart, and localized
+      HTML is crawlable.
+  - id: prefer-protocol-over-scraping
+    statement: Agents should prefer the UCP/MCP endpoints or the Shop skill over screen-scraping
+      or scripting the storefront directly.
+  contact: bots@shopify.com
+agent_identity:
+  required: true
+  mechanism: UCP agent profile
+  field: meta.ucp-agent.profile
+  format: URI
+  enforcement: >-
+    Enforced server-side. A tools/call without a resolvable profile URI returns JSON-RPC
+    -32001 "UCP discovery failed" / invalid_profile_url with HTTP 422 — observed live.
+    tools/list itself is anonymous.
+summary:
+  operations: 13
+  by_action_class:
+    connected: 6
+    acting: 7
+  by_consequence:
+    read: 6
+    write: 6
+    financial: 1
+  human_in_the_loop_required: 1
+operations:
+- tool: search_catalog
+  action_class: connected
+  consequence: read
+  audit: optional
+  human_in_the_loop: not-required
+- tool: lookup_catalog
+  action_class: connected
+  consequence: read
+  audit: optional
+  human_in_the_loop: not-required
+- tool: get_product
+  action_class: connected
+  consequence: read
+  audit: optional
+  human_in_the_loop: not-required
+- tool: get_cart
+  action_class: connected
+  consequence: read
+  audit: optional
+  human_in_the_loop: not-required
+- tool: get_checkout
+  action_class: connected
+  consequence: read
+  audit: optional
+  human_in_the_loop: not-required
+- tool: get_order
+  action_class: connected
+  consequence: read
+  audit: optional
+  human_in_the_loop: not-required
+  note: Reads buyer order data — treat the order id as a bearer capability.
+- tool: create_cart
+  action_class: acting
+  consequence: write
+  audit: required
+  human_in_the_loop: not-required
+- tool: update_cart
+  action_class: acting
+  consequence: write
+  audit: required
+  human_in_the_loop: not-required
+- tool: cancel_cart
+  action_class: acting
+  consequence: write
+  audit: required
+  human_in_the_loop: not-required
+- tool: create_checkout
+  action_class: acting
+  consequence: write
+  audit: required
+  human_in_the_loop: not-required
+- tool: update_checkout
+  action_class: acting
+  consequence: write
+  audit: required
+  human_in_the_loop: not-required
+  note: Carries shipping address — PII enters the call here.
+- tool: cancel_checkout
+  action_class: acting
+  consequence: write
+  audit: required
+  human_in_the_loop: not-required
+- tool: complete_checkout
+  action_class: acting
+  consequence: financial
+  audit: required
+  human_in_the_loop: required
+  escalation: buyer-approval
+  note: >-
+    The one operation the provider explicitly fences. Payment is finalized here and
+    the store's published policy forbids completing it without explicit, contemporaneous
+    human approval. Agents that cannot obtain that approval are directed to route the
+    purchase through Shop Pay via the Shop skill.
+audience: null
+x-evidence:
+- url: https://100thieves.com/agents.md
+  http_status: 200
+- url: https://100thieves.com/robots.txt
+  http_status: 200
+- url: https://100thieves.com/api/ucp/mcp
+  http_status: 422
+  note: agent-profile gate observed on tools/call

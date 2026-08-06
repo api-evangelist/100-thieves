@@ -1,0 +1,62 @@
+generated: '2026-08-05'
+method: probed
+source:
+- https://100thieves.com/.well-known/ucp
+- https://100thieves.com/api/2024-04/graphql.json
+- https://100thieves.com/agents.md
+versioning:
+- surface: ucp-mcp
+  scheme: dated release train
+  current: '2026-04-08'
+  supported:
+  - version: '2026-04-08'
+    profile: https://100t.myshopify.com/.well-known/ucp/2026-04-08
+    label: latest stable
+  - version: '2026-01-23'
+    profile: https://100t.myshopify.com/.well-known/ucp/2026-01-23
+  discovery: https://100thieves.com/.well-known/ucp
+  note: Two versions are advertised concurrently, so the previous train is still served.
+- surface: storefront-graphql
+  scheme: dated version in URI path
+  current: '2024-04'
+  example: https://100thieves.com/api/2024-04/graphql.json
+  introspection_field: publicApiVersions
+  note: The schema exposes a publicApiVersions query field listing supported and
+    unsupported versions; version policy is set by the platform vendor, not by 100
+    Thieves.
+deprecation:
+  policy_url: null
+  policy_published_by_100_thieves: false
+  sunset_header: unknown
+  detail: >-
+    100 Thieves publishes no deprecation or sunset policy of its own. Deprecation is
+    visible only inside the GraphQL schema, where fields carry the standard @deprecated
+    directive with a deprecationReason. No Deprecation pointer is emitted.
+sla:
+  url: null
+  uptime_target: null
+  published: false
+status_page:
+  url: null
+  published: false
+  detail: >-
+    No status page exists on any 100 Thieves host. status.100thieves.com does not
+    resolve. The storefront runs on Shopify, whose platform status page is a vendor
+    property and is not advertised by 100 Thieves. No StatusPage pointer is emitted.
+changelog:
+  url: null
+  published: false
+  detail: >-
+    No dated changelog for any API surface. The dated UCP version train above is the
+    only release signal. No ChangeLog pointer or changelog/ artifact is emitted.
+deprecated_operations: []
+deprecated_operations_note: No OpenAPI exists. Deprecated GraphQL fields are marked
+  inline in graphql/100-thieves-storefront.graphql.
+x-evidence:
+- url: https://100thieves.com/.well-known/ucp
+  http_status: 200
+- url: https://100thieves.com/api/2024-04/graphql.json
+  http_status: 200
+- url: https://status.100thieves.com/
+  http_status: 0
+  note: DNS did not resolve

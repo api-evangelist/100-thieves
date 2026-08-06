@@ -1,23 +1,130 @@
 aid: 100-thieves
 name: 100 Thieves
-description: '100 Thieves is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: '100 Thieves is an American lifestyle brand and gaming organization founded
+  in 2017 by Call of Duty World Champion Matthew "Nadeshot" Haag, headquartered in
+  Los Angeles, California. The company operates championship esports franchises in
+  League of Legends, VALORANT and Call of Duty, a roster of content creators, and a
+  premium streetwear apparel line sold through its own direct-to-consumer online store.
+  Its public machine-readable surface is that storefront: a Shopify-hosted commerce
+  platform that publishes agent-facing instructions at /agents.md and /llms.txt, a
+  Universal Commerce Protocol (UCP) merchant profile at /.well-known/ucp, an anonymous
+  Model Context Protocol endpoint exposing thirteen catalog, cart, checkout and order
+  tools, and a Storefront GraphQL API whose schema is openly introspectable. 100 Thieves
+  publishes no developer portal, API reference, or SDKs of its own.'
+image: https://100thieves.com/cdn/shop/files/100-Thieves-arcade.jpg?v=1710263463
 url: https://raw.githubusercontent.com/api-evangelist/100-thieves/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-05'
 modified: '2026-08-05'
 tags:
 - Company
-apis: []
+- Esports
+- Gaming
+- Apparel
+- Retail
+- E-Commerce
+- Entertainment
+- Media
+- Direct To Consumer
+- Agentic Commerce
+x-enrichment:
+  date: '2026-08-05'
+  status: enriched
+  artifacts_added: 22
+  pass: local-v1
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- aid: 100-thieves-ucp-commerce-mcp
+  name: 100 Thieves UCP Commerce MCP API
+  description: An anonymous Model Context Protocol endpoint implementing the Universal
+    Commerce Protocol (UCP) shopping service for the 100 Thieves online store. Exposes
+    thirteen tools covering catalog search and lookup, product detail, cart lifecycle,
+    checkout lifecycle, and order retrieval. Checkout completion requires contemporaneous
+    human buyer approval per the store's published agent rules.
+  humanURL: https://100thieves.com/agents.md
+  baseURL: https://100thieves.com/api/ucp/mcp
+  tags:
+  - MCP
+  - Agentic Commerce
+  - Commerce
+  - Checkout
+  - Catalog
+  properties:
+  - type: MCPServer
+    url: mcp/100-thieves-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/100-thieves-tool-crosswalk.yml
+- aid: 100-thieves-storefront-graphql
+  name: 100 Thieves Storefront GraphQL API
+  description: The Shopify Storefront GraphQL API as deployed on the 100 Thieves domain,
+    version 2024-04. Schema introspection is open to anonymous callers and returns
+    414 types, 35 query root fields and 41 mutations covering products, collections,
+    blogs, pages, search, cart, customer accounts and Shop Pay payment request sessions.
+  humanURL: https://shopify.dev/docs/api/storefront
+  baseURL: https://100thieves.com/api/2024-04/graphql.json
+  tags:
+  - GraphQL
+  - Commerce
+  - Catalog
+  - Cart
+  properties:
+  - type: GraphQL
+    url: graphql/100-thieves-storefront.graphql
+- aid: 100-thieves-storefront-json
+  name: 100 Thieves Storefront JSON Endpoints
+  description: The read-only JSON surface the store documents for agents that only
+    need to browse catalog data without transacting - product JSON by handle, collection
+    product listings, and product search. No authentication is required.
+  humanURL: https://100thieves.com/agents.md
+  baseURL: https://100thieves.com/
+  tags:
+  - JSON
+  - Catalog
+  - Read Only
 common:
+- type: DomainSecurity
+  url: security/100-thieves-domain-security.yml
 - type: Website
-  url: https://forgeglobal.com/100-thieves_stock/
+  url: https://100thieves.com/
+- type: Documentation
+  url: https://100thieves.com/agents.md
+- type: LLMsTxt
+  url: llms/100-thieves-llms.txt
+- type: WellKnown
+  url: well-known/100-thieves-well-known.yml
+- type: Authentication
+  url: authentication/100-thieves-authentication.yml
+- type: OAuthScopes
+  url: scopes/100-thieves-scopes.yml
+- type: OpenIDConnect
+  url: well-known/100-thieves-openid-configuration.json
+- type: Conventions
+  url: conventions/100-thieves-conventions.yml
+- type: Conformance
+  url: conformance/100-thieves-conformance.yml
+- type: ErrorCatalog
+  url: errors/100-thieves-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/100-thieves-lifecycle.yml
+- type: DataModel
+  url: data-model/100-thieves-data-model.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: AgenticAccess
+  url: agentic-access/100-thieves-agentic-access.yml
+- type: Blog
+  url: https://100thieves.com/blogs/news
+- type: Support
+  url: https://100thieves.com/pages/contact
+- type: SignUp
+  url: https://100thieves.com/account/login
+- type: TermsOfService
+  url: https://100thieves.com/policies/terms-of-service
+- type: PrivacyPolicy
+  url: https://100thieves.com/policies/privacy-policy

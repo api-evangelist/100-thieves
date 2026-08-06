@@ -1,0 +1,115 @@
+generated: '2026-08-05'
+method: searched
+source: https://100thieves.com/api/ucp/mcp
+status: published
+server:
+  name: 100-thieves-ucp-shopping
+  transport: http
+  url: https://100thieves.com/api/ucp/mcp
+  alternate_url: https://100t.myshopify.com/api/ucp/mcp
+  protocol: MCP over JSON-RPC 2.0
+  authentication: none
+  discovery:
+  - https://100thieves.com/.well-known/ucp
+  - https://100thieves.com/agents.md
+  - https://100thieves.com/llms.txt
+  - https://100thieves.com/robots.txt
+implements:
+  protocol: Universal Commerce Protocol (UCP)
+  service: dev.ucp.shopping
+  version: '2026-04-08'
+  supported_versions:
+  - '2026-04-08'
+  - '2026-01-23'
+  spec: https://ucp.dev/2026-04-08/specification/overview/
+  schema: https://ucp.dev/2026-04-08/services/shopping/mcp.openrpc.json
+  capabilities:
+  - dev.ucp.shopping.cart
+  - dev.ucp.shopping.checkout
+  - dev.ucp.shopping.fulfillment
+  - dev.ucp.shopping.discount
+  - dev.ucp.shopping.order
+  platform: Shopify
+  note: >-
+    The tool contract is defined by the UCP shopping service, not authored by 100
+    Thieves. The endpoint, the merchant profile, and the store's agent policy are
+    served from the 100 Thieves host.
+tools_manifest:
+  file: 100-thieves-tools-list.json
+  method: probed
+  source: 'POST https://100thieves.com/api/ucp/mcp {"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+  http_status: 200
+  note: Saved verbatim. Every tool carries a full JSON Schema inputSchema — anonymous
+    introspection is open, so no auth-gated fallback was needed.
+tools:
+- name: search_catalog
+  category: catalog
+  description: Search for products from the online store using natural-language queries,
+    filter criteria, or both. At least one of query or filters is required. Paginated
+    via pagination.cursor.
+  required: [meta, catalog]
+- name: lookup_catalog
+  category: catalog
+  description: Look up multiple products or variants by identifier in one call.
+  required: [meta, catalog]
+- name: get_product
+  category: catalog
+  description: Retrieve complete product detail by identifier.
+  required: [meta, catalog]
+- name: create_cart
+  category: cart
+  description: Creates a new cart.
+  required: [meta, cart]
+- name: get_cart
+  category: cart
+  description: Get the cart contents.
+  required: [meta, id]
+- name: update_cart
+  category: cart
+  description: Perform updates to a cart.
+  required: [meta, cart, id]
+- name: cancel_cart
+  category: cart
+  description: Cancels a cart.
+  required: [meta, id]
+- name: create_checkout
+  category: checkout
+  description: Creates a checkout. Returns line items, totals, discounts and taxes.
+  required: [meta, checkout]
+- name: get_checkout
+  category: checkout
+  description: Returns details about the checkout, including line items, totals and
+    applicable discounts.
+  required: [meta, id]
+- name: update_checkout
+  category: checkout
+  description: Updates a checkout — used to set shipping address and delivery method.
+  required: [meta, checkout, id]
+- name: complete_checkout
+  category: checkout
+  description: Completes a checkout and returns the checkout result. Requires explicit
+    contemporaneous human buyer approval of payment.
+  required: [meta, id, checkout]
+  human_approval_required: true
+- name: cancel_checkout
+  category: checkout
+  description: Cancels a checkout.
+  required: [meta, id]
+- name: get_order
+  category: order
+  description: Get the details of an order.
+  required: [meta, id]
+coverage:
+  tools_total: 13
+  with_input_schema: 13
+  categories:
+    catalog: 3
+    cart: 4
+    checkout: 5
+    order: 1
+x-evidence:
+  fetched: '2026-08-05'
+  url: https://100thieves.com/api/ucp/mcp
+  method: POST tools/list
+  http_status: 200
+  content_type: application/json

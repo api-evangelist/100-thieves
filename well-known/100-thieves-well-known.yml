@@ -1,0 +1,66 @@
+generated: '2026-08-05'
+method: probed
+source: https://100thieves.com/.well-known/
+host: https://100thieves.com
+notes: >-
+  Control probe of /.well-known/zzz-nonexistent-abc returned 404, confirming this
+  host does not answer /.well-known/* with a catch-all 200 — the 200s below are real
+  documents, not SPA soft-404s. The OIDC/OAuth metadata is served by Shopify Customer
+  Accounts for shop id 31052262 on behalf of the merchant.
+documents:
+- path: /.well-known/ucp
+  status: 200
+  content_type: application/json
+  file: 100-thieves-ucp.json
+  description: Universal Commerce Protocol merchant profile — supported versions, service
+    endpoints, capabilities and payment handlers.
+- path: /.well-known/openid-configuration
+  status: 200
+  content_type: application/json
+  file: 100-thieves-openid-configuration.json
+  description: OpenID Connect discovery for Shopify Customer Accounts.
+- path: /.well-known/oauth-authorization-server
+  status: 200
+  content_type: application/json
+  file: 100-thieves-oauth-authorization-server.json
+  description: RFC 8414 authorization server metadata — byte-identical to the OIDC
+    discovery document.
+- path: /.well-known/security.txt
+  status: 404
+- path: /.well-known/api-catalog
+  status: 404
+- path: /.well-known/ai-plugin.json
+  status: 404
+- path: /.well-known/agent-card.json
+  status: 404
+- path: /.well-known/agent.json
+  status: 404
+other_hosts:
+- host: https://100t.myshopify.com
+  documents:
+  - path: /.well-known/ucp
+    status: 200
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+adjacent_agent_documents:
+- path: /agents.md
+  status: 200
+  content_type: text/markdown
+  description: Canonical agent-facing description of the store.
+- path: /llms.txt
+  status: 200
+  content_type: text/markdown
+  file: ../llms/100-thieves-llms.txt
+  description: Mirror of /agents.md served at the llms.txt convention path.
+- path: /robots.txt
+  status: 200
+  content_type: text/plain
+  description: Carries agent policy directives in comments — points at /agents.md,
+    the UCP discovery doc and the UCP/MCP endpoint, and states checkout must not be
+    completed without contemporaneous human approval.
+x-evidence:
+  fetched: '2026-08-05'
+  control_path: /.well-known/zzz-nonexistent-abc
+  control_status: 404

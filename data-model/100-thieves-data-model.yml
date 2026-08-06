@@ -1,0 +1,121 @@
+generated: '2026-08-05'
+method: derived
+source:
+- mcp/100-thieves-tools-list.json
+- graphql/100-thieves-storefront.graphql
+note: >-
+  Derived from the two machine-readable contracts actually served on the 100 Thieves
+  host — the UCP/MCP tool input schemas and the introspected Storefront GraphQL schema.
+  There is no OpenAPI to derive $ref links from, so entity relationships come from
+  id-reference fields in the tool schemas and from GraphQL connection fields verified
+  in the SDL.
+entities:
+- name: Product
+  surfaces: [mcp, graphql, json]
+  graphql_type: Product
+  identifiers: [id, handle]
+  json_endpoint: GET /products/{handle}.json
+  relationships:
+  - {kind: has_many, target: ProductVariant, via: variants}
+  - {kind: belongs_to_many, target: Collection, via: collections}
+  - {kind: has_many, target: Image, via: images}
+- name: ProductVariant
+  surfaces: [mcp, graphql]
+  graphql_type: ProductVariant
+  identifiers: [id]
+  relationships:
+  - {kind: belongs_to, target: Product, via: product}
+  note: The variant id is what a cart line item references — cart.line_items[].item.id
+    is documented as "The Product Variant ID to add or update."
+- name: Collection
+  surfaces: [graphql, json]
+  graphql_type: Collection
+  identifiers: [id, handle]
+  json_endpoint: GET /collections/{handle}/products.json
+  relationships:
+  - {kind: has_many, target: Product, via: products}
+- name: Cart
+  surfaces: [mcp, graphql]
+  graphql_type: Cart
+  identifiers: [id]
+  relationships:
+  - {kind: has_many, target: CartLine, via: line_items}
+  - {kind: has_one, target: Buyer, via: buyer}
+  - {kind: has_one, target: BuyerContext, via: context}
+  - {kind: has_one, target: Checkout, via: checkout, note: A cart is promoted to a
+      checkout; the UCP tools treat them as separate ids.}
+- name: CartLine
+  surfaces: [mcp, graphql]
+  graphql_type: BaseCartLine
+  identifiers: [id]
+  relationships:
+  - {kind: belongs_to, target: Cart, via: cart}
+  - {kind: belongs_to, target: ProductVariant, via: item.id}
+  fields: [id, quantity, item.id]
+- name: Checkout
+  surfaces: [mcp]
+  graphql_type: null
+  identifiers: [id]
+  relationships:
+  - {kind: has_many, target: CartLine, via: line_items}
+  - {kind: has_one, target: FulfillmentSelection, via: delivery}
+  - {kind: has_many, target: Discount, via: discounts}
+  - {kind: has_one, target: Order, via: order, note: complete_checkout yields the order.}
+  note: MCP-only. The 2024-04 Storefront GraphQL schema exposes no checkout type; see
+    mcp/100-thieves-tool-crosswalk.yml mcp_only.
+- name: Order
+  surfaces: [mcp, graphql]
+  graphql_type: Order
+  identifiers: [id]
+  relationships:
+  - {kind: belongs_to, target: Customer, via: customer}
+  - {kind: has_many, target: CartLine, via: lineItems}
+  note: Reachable in GraphQL only via customer.orders behind a customer access token;
+    the MCP get_order tool resolves by id.
+- name: Buyer
+  surfaces: [mcp]
+  fields: [email, phone_number]
+  relationships:
+  - {kind: belongs_to, target: Cart, via: buyer}
+- name: BuyerContext
+  surfaces: [mcp]
+  fields: [address_country, address_region, postal_code, language, currency, intent]
+  note: Provisional localization and pricing hints; superseded by authoritative data
+    such as a shipping address, and unsupported hints may be ignored without error.
+- name: Customer
+  surfaces: [graphql]
+  graphql_type: Customer
+  identifiers: [id, email]
+  relationships:
+  - {kind: has_many, target: Order, via: orders}
+  - {kind: has_many, target: MailingAddress, via: addresses}
+  - {kind: has_one, target: MailingAddress, via: defaultAddress}
+  auth: Requires a customer access token; see authentication/100-thieves-authentication.yml.
+- name: Article
+  surfaces: [graphql]
+  graphql_type: Article
+  relationships:
+  - {kind: belongs_to, target: Blog, via: blog}
+- name: Blog
+  surfaces: [graphql]
+  graphql_type: Blog
+  relationships:
+  - {kind: has_many, target: Article, via: articles}
+  human_url: https://100thieves.com/blogs/news
+- name: Shop
+  surfaces: [graphql]
+  graphql_type: Shop
+  note: Store-level metadata, policies and payment settings.
+core_flow:
+- search_catalog or get_product resolves a Product and its ProductVariant id
+- create_cart with line_items[].item.id = variant id yields a Cart id
+- update_cart mutates lines, buyer and context against that Cart id
+- create_checkout promotes the cart, yielding a Checkout id
+- update_checkout attaches delivery address and method
+- complete_checkout requires human buyer approval and yields an Order
+coverage:
+  entities: 14
+  graphql_types_total: 414
+  note: Only the entities reachable from the documented agent flows and the GraphQL
+    root fields are modelled; the full 414-type schema is in graphql/.
+render: null
