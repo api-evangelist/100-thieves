@@ -11,6 +11,17 @@ description: '100 Thieves is an American lifestyle brand and gaming organization
   Model Context Protocol endpoint exposing thirteen catalog, cart, checkout and order
   tools, and a Storefront GraphQL API whose schema is openly introspectable. 100 Thieves
   publishes no developer portal, API reference, or SDKs of its own.'
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://100thieves.com/cdn/shop/files/100-Thieves-arcade.jpg?v=1710263463
 url: https://raw.githubusercontent.com/api-evangelist/100-thieves/refs/heads/main/apis.yml
 x-type: company
