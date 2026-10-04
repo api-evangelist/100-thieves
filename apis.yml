@@ -93,6 +93,9 @@ apis:
     url: mcp/100-thieves-mcp.yml
   - type: ToolCrosswalk
     url: mcp/100-thieves-tool-crosswalk.yml
+  x-surface: platform-generated
+  x-platform: shopify
+  x-platform-surface: ucp
 - aid: 100-thieves:100-thieves-storefront-graphql
   name: 100 Thieves Storefront GraphQL API
   description: The Shopify Storefront GraphQL API as deployed on the 100 Thieves domain, version 2024-04.
@@ -109,17 +112,22 @@ apis:
   properties:
   - type: GraphQL
     url: graphql/100-thieves-storefront.graphql
+  x-surface: platform-generated
+  x-platform: shopify
+  x-platform-surface: storefront-graphql
 - aid: 100-thieves:100-thieves-storefront-json
   name: 100 Thieves Storefront JSON Endpoints
   description: The read-only JSON surface the store documents for agents that only need to browse catalog
     data without transacting - product JSON by handle, collection product listings, and product search.
     No authentication is required.
   humanURL: https://100thieves.com/agents.md
-  baseURL: https://100thieves.com/
   tags:
   - JSON
   - Catalog
   - Read Only
+  x-surface: platform-generated
+  x-platform: shopify
+  x-platform-surface: storefront-json
 common:
 - type: DomainSecurity
   url: security/100-thieves-domain-security.yml
