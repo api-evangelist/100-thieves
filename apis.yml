@@ -40,7 +40,7 @@ x-type: company
 x-source: harvest:secondary-market
 specificationVersion: '0.23'
 created: '2026-08-05'
-modified: '2026-08-05'
+modified: '2026-10-06'
 tags:
 - Company
 - Esports
@@ -129,6 +129,8 @@ apis:
   x-platform: shopify
   x-platform-surface: storefront-json
 common:
+- url: https://100thieves.com/blogs/news.atom
+  type: BlogRSS
 - type: DomainSecurity
   url: security/100-thieves-domain-security.yml
 - type: Website
